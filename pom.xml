@@ -11,7 +11,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>vn.edu.tlu.hatrang</groupId>
 	<artifactId>autoHGPEC</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 
 	<name>autoHGPEC</name>
 	<packaging>bundle</packaging>

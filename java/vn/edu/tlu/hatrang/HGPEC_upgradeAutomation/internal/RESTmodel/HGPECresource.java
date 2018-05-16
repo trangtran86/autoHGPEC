@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiResponses;
  * @version 1.0
  */
 
-@Api(tags = "Apps: HGPEC")
+@Api(tags = "Apps: autoHGPEC")
 @Path("/hgpec/v1/")
 public interface HGPECresource {
 	/**
@@ -49,5 +49,49 @@ public interface HGPECresource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<DiseaseFilter> getDisease(@ApiParam(value = "Disease name", required = true) @PathParam("diseaseName") String diseaseName);
+	
+	/**
+    *
+    * Simple method.
+    *
+    * The function lists the limit rank top of diseases. All the steps in command must be done.
+    *
+    * @param diseaseName String name of disease
+    * @see DiseaseFilter
+    * @since version 1.0
+    */
+	
+	//------- select disease ----------
+	@ApiOperation(value = "Return rank top of disease", notes = "Return rank top of disease of users' interest.\n\n")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Sucess", response = RankedDisease.class, responseContainer = "List"),
+			@ApiResponse(code = 404, message = "Unsucess. Complete all the steps in CyREST command for result", response = ErrorMessage.class)
+
+	})
+	@Path("getRank/Disease/{limit}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<RankedDisease> getRankedDiseases(@ApiParam(value = "Select top number:", required = true) @PathParam("limit") int limit);
+	
+	/**
+    *
+    * Simple method.
+    *
+    * The function lists the limit rank top of genes. All the steps in command must be done.
+    *
+    * @param diseaseName String name of disease
+    * @see DiseaseFilter
+    * @since version 1.0
+    */
+	
+	//------- select disease ----------
+	@ApiOperation(value = "Return rank top of genes", notes = "Return rank top of disease of users' interest.\n\n")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Sucess", response = RankedGene.class, responseContainer = "List"),
+			@ApiResponse(code = 404, message = "Unsucess. Complete all the steps in CyREST command for result", response = ErrorMessage.class)
+
+	})
+	@Path("getRank/Genes/{limit}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<RankedGene> getRankedGenes(@ApiParam(value = "Select top number:", required = true) @PathParam("limit") int limit);
 
 }

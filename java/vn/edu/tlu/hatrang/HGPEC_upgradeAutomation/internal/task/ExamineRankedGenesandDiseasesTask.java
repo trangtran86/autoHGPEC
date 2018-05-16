@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import org.cytoscape.model.CyNetwork;
@@ -32,6 +33,7 @@ public class ExamineRankedGenesandDiseasesTask implements Task {
 	TaskManager cyTaskManager;
 	SynchronousTaskManager cySynchronousTaskManager;
 	public static Set<GO> knownannset;
+	public static Set<String> knownpathwayids;
 	private volatile boolean interrupted = false;
 
 	public ExamineRankedGenesandDiseasesTask(CyNetworkFactory networkFactory, CyNetworkManager networkManager,
@@ -275,12 +277,54 @@ public class ExamineRankedGenesandDiseasesTask implements Task {
 				if (nodeTable.getColumn("Disease Ontology") == null) {
 					nodeTable.createColumn("Disease Ontology", String.class, false);
 				}
+				if (nodeTable.getColumn("Shared Gene") == null) {
+					nodeTable.createColumn("Shared Gene", String.class, false);
+				}
+				
+				if (nodeTable.getColumn("Shared Protein Complex") == null) {
+					nodeTable.createColumn("Shared Protein Complex", String.class, false);
+				}
+				if (nodeTable.getColumn("Shared Pathway") == null) {
+					nodeTable.createColumn("Shared Pathway", String.class, false);
+				}
+				if (nodeTable.getColumn("Shared Disease Ontology") == null) {
+					nodeTable.createColumn("Shared Disease Ontology", String.class, false);
+				}
+	           
 
 				networkManager.addNetwork(newnetwork);
 
 				taskMonitor.setStatusMessage("Annotating Ranked Diseases with KEGG pathways...");
 				System.out.println("Annotating Ranked Diseases with KEGG pathways...");
+				
 
+	            Set<String> KnownPathways = new TreeSet<String>();
+	            Set<String> KnownComplexes = new TreeSet<String>();
+	            Set<String> KnownDOs = new TreeSet<String>();
+	            Set<String> KnownGenes = new TreeSet<String>();
+	            for(int i=0;i<MainData.AllKnownGenes.size();i++){
+	                String EID= MainData.AllKnownGenes.get(i).EntrezID;
+	                KnownGenes.add(EID);
+	                if(BasicData.Gene2Pathways.get(EID)!=null){
+	                    KnownPathways.addAll(BasicData.Gene2Pathways.get(EID));
+	                    
+	                }
+	                if(BasicData.Gene2Complexes.get(EID)!=null){
+	                    
+	                    KnownComplexes.addAll(BasicData.Gene2Complexes.get(EID));
+	                }
+	                if(BasicData.Gene2DOs.get(EID)!=null){
+	                    
+	                    KnownDOs.addAll(BasicData.Gene2DOs.get(EID));
+	                }
+	                
+	            }
+	            
+	            System.out.println(KnownGenes.size() + "\t" + KnownPathways.size() + "\t" + KnownComplexes.size());
+	            
+	            taskMonitor.setStatusMessage("Checking Shared Genes with Disease of interest...");
+	            System.out.println("Checking Shared Genes with Disease of interest...");
+	            
 				for (CyNode node : selected_diseases) {
 					String EIDList = network_disease.getRow(node).get("Associated Genes", String.class);
 					String DiseaseID = network_disease.getRow(node).get("Disease ID", String.class);
@@ -302,26 +346,30 @@ public class ExamineRankedGenesandDiseasesTask implements Task {
 						continue;
 					String[] EIDs = EIDList.split(",");
 					ArrayList<String> SymbolArr = new ArrayList<String>();
-
+					ArrayList<String> SharedGenes = new ArrayList<String>();
+					
 					for (int i = 0; i < EIDs.length; i++) {
+						String EID = EIDs[i].trim();
 						for (int j = 0; j < BasicData.AllEntrezID_OfficialSymbol.size(); j++) {
 							String sym = "";
-							String EID = EIDs[i].trim();
 							if (BasicData.AllEntrezID_OfficialSymbol.containsKey(EID)) {
 								sym = BasicData.AllEntrezID_OfficialSymbol.get(EID);
 								SymbolArr.add(sym);
 							}
 							break;
 						}
+						if(KnownGenes.contains(EID)){
+	                        SharedGenes.add(EID);
+	                    }
 					}
 
 					if (interrupted == true)
 						return;
 					String AssoGeneSymbol = SymbolArr.toString().substring(1, SymbolArr.toString().length() - 1);
 					row.set("Ass Genes (Symbol)", AssoGeneSymbol);
-
+					row.set("Shared Gene", SharedGenes.toString().substring(1, SharedGenes.toString().length()-1));
 					Set<String> PathwayIDList = new TreeSet<String>();
-
+					System.out.println("Checking Shared Protein Complexes with Disease of interest...");
 					for (int i = 0; i < EIDs.length; i++) {
 						String EID = EIDs[i].trim();
 						if (BasicData.Gene2Pathways.get(EID) != null) {
@@ -332,7 +380,23 @@ public class ExamineRankedGenesandDiseasesTask implements Task {
 					PathwayIDListStr = PathwayIDListStr.substring(1, PathwayIDListStr.length() - 1);
 
 					row.set("Ass Pathway (KEGG ID)", PathwayIDListStr);
-
+					StringTokenizer st = new StringTokenizer(PathwayIDListStr,",");
+	                
+	                ArrayList<String> SharedPathways = new ArrayList<String>();
+	                while(st.hasMoreTokens()){
+	                    String PathwayID = (String)st.nextToken().trim();
+	                    //PathwayIDArr.add((String)st.nextToken().trim());
+	                    if(KnownPathways.contains(PathwayID)){
+	                        SharedPathways.add(PathwayID);
+	                    }
+	                }
+	                
+	                if(this.interrupted==true) return;
+	                                
+	                row.set("Shared Pathway",SharedPathways.toString().substring(1, SharedPathways.toString().length()-1));
+	                
+					//ArrayList<String> ComplexIDArr = new ArrayList<String>();
+	                
 					// -------------------------- column Protein Comlexes
 					taskMonitor.setStatusMessage("Annotating Ranked Diseases with Protein Complexes...");
 					System.out.println("Annotating Ranked Diseases with Protein Complexes...");
@@ -350,10 +414,23 @@ public class ExamineRankedGenesandDiseasesTask implements Task {
 							ComplexIDList.addAll(BasicData.Gene2Complexes.get(EID));
 						}
 					}
+					
+					
 					String ComplexIDListStr = ComplexIDList.toString();
 					ComplexIDListStr = ComplexIDListStr.substring(1, ComplexIDListStr.length() - 1);
 
 					row.set("Ass Protein Complex", ComplexIDListStr);
+					StringTokenizer stSC = new StringTokenizer(ComplexIDListStr,",");
+	                
+	                ArrayList<String> SharedComplexes = new ArrayList<String>();
+	                while(st.hasMoreTokens()){
+	                    String ComplexID = (String)stSC.nextToken().trim();
+	                    //PathwayIDArr.add((String)st.nextToken().trim());
+	                    if(KnownComplexes.contains(ComplexID)){
+	                        SharedComplexes.add(ComplexID);
+	                    }
+	                }
+	                row.set("Shared Protein Complex", SharedComplexes.toString().substring(1, SharedComplexes.toString().length()-1));
 
 					// ------------------------- column Disease Ontology------
 					taskMonitor.setStatusMessage("Annotating Ranked Diseases with Disease Ontologies...");
@@ -373,7 +450,21 @@ public class ExamineRankedGenesandDiseasesTask implements Task {
 					DOIDListStr = DOIDListStr.substring(1, DOIDListStr.length() - 1);
 
 					row.set("Disease Ontology", DOIDListStr);
-
+					StringTokenizer stDO = new StringTokenizer(DOIDListStr,",");
+	                
+	                ArrayList<String> SharedDOs = new ArrayList<String>();
+	                while(st.hasMoreTokens()){
+	                    String DOID = (String)stDO.nextToken().trim();
+	                    //PathwayIDArr.add((String)st.nextToken().trim());
+	                    if(KnownDOs.contains(DOID)){
+	                        SharedDOs.add(DOID);
+	                    }
+	                }
+	                
+	                if(this.interrupted==true) return;
+	                                
+	                row.set("Shared Disease Ontology",SharedDOs.toString().substring(1, SharedDOs.toString().length()-1));
+	                
 				}
 
 			} catch (Exception e) {

@@ -177,7 +177,6 @@ public class PrioritizeTask implements ObservableTask {
 		// }
 		// } else {
 		System.out.println("All ranked network genes are shown");
-		r = 0;
 		for (i = 0; i < MainData.PrioritizationScore.size(); i++) {
 			if (MainData.PrioritizationScore.get(i).Type.compareTo("Gene/Protein") == 0) {
 				r++;

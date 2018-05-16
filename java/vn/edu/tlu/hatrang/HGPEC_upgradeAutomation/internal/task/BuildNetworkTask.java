@@ -43,7 +43,7 @@ public class BuildNetworkTask implements ObservableTask {
 	private SynchronousTaskManager cySynchronousTaskManager; 
     
 	
-	public static String diseaseFile;
+	public static String diseaseFile="";
 
 	@Tunable(description = "Choose disease network", groups = { "Step 1: Define a Heterogeneous Network" },context=Tunable.BOTH_CONTEXT)
 	public ListSingleSelection<String> diseaseNetwork=new ListSingleSelection<>("Disease_Similarity_Network_5", "Disease_Similarity_Network_10",

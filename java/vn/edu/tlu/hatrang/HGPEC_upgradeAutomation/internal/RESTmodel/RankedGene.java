@@ -19,6 +19,13 @@ public class RankedGene extends GeneFilter{
 		this.isTest = isTest;
 		this.score = score;
 	}
+	public RankedGene(String name, String entrezID, String officialSymbol, String alterSymbol, String type,
+			boolean isSeed, boolean isTest) {
+		super(name, entrezID, officialSymbol, alterSymbol);
+		this.type = type;
+		this.isSeed = isSeed;
+		this.isTest = isTest;
+	}
 	
 	
 	

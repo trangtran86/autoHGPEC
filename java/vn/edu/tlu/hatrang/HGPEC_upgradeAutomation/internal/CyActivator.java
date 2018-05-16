@@ -65,6 +65,8 @@ import vn.edu.tlu.hatrang.HGPEC_upgradeAutomation.internal.task.PCG_NeighborNetw
 import vn.edu.tlu.hatrang.HGPEC_upgradeAutomation.internal.task.PCG_NeighborNetworkTaskFactory;
 import vn.edu.tlu.hatrang.HGPEC_upgradeAutomation.internal.task.PCG_SubceptibleChromosomeNetworkTask;
 import vn.edu.tlu.hatrang.HGPEC_upgradeAutomation.internal.task.PCG_SubceptibleChromosomeNetworkTaskFactory;
+import vn.edu.tlu.hatrang.HGPEC_upgradeAutomation.internal.task.PCG_UserDefineTask;
+import vn.edu.tlu.hatrang.HGPEC_upgradeAutomation.internal.task.PCG_UserDefineTaskFactory;
 import vn.edu.tlu.hatrang.HGPEC_upgradeAutomation.internal.task.PrioritizeTask;
 import vn.edu.tlu.hatrang.HGPEC_upgradeAutomation.internal.task.PrioritizeTaskFactory;
 import vn.edu.tlu.hatrang.HGPEC_upgradeAutomation.internal.task.SelectDiseaseTask;
@@ -294,37 +296,37 @@ public class CyActivator extends AbstractCyActivator {
 			selectProps.setProperty(TOOLTIP,  PCG_NeighborNetworkDescription);
 			registerAllServices(context, provideCandidateGeneSetTaskFactory, selectProps);
 		}
-//		{
-//			Properties selectProps = new Properties();
-//			PCG_SubceptibleChromosomeNetworkTaskFactory provideCandidateGeneSetTaskFactory = new PCG_SubceptibleChromosomeNetworkTaskFactory(cyNetworkFactory, cyNetworkManager, cyTaskManager);
-//			String PCG_NeighborNetworkDescription = "Step 3: Select candidate sets - User-defined";
-//			String PCG_NeighborNetworkLongDescription="Step 3: Provide candidate gene sets by selecting User-defined"
-//					+ "\n\nThis step is followed "
-//					+ "\n\n\t+ Step 1: Build Heterogeneous Network at 'POST /v1/commands/"+MYAPP_COMMAND_NAMESPACE+"/step1_build_network)"
-//					+ "\n\n\t+ Step 2.1: Select disease at 'POST /v1/commands/"+MYAPP_COMMAND_NAMESPACE+"/step21_select_disease"
-//					+ "\n\n\t+ Step 2.2: Select disease of interest and associated genes 'POST /v1/commands/"+MYAPP_COMMAND_NAMESPACE+"/step22_create_training_list"
-//					+ "\n\nThere are five ways to construct a candidate gene set: "
-//					+ "\n\n\t+ Neighbors of Training Genes in Gene Network"
-//					+ "\n\n\t+ Neighbors Of Training Genes in Chromosome (also known as Artificial Linkage Interval)"
-//					+ "\n\n\t+ All remaining genes in Gene Network"
-//					+ "\n\n\t+ Susceptible Chromosome Regions/Bands"
-//					+ "\n\n\t+ User-defined"
-//					+ "\n\nThis command uses 'User-defined'. Refer to other ways by looking at the other commands";
-//			
-//			
-//			selectProps = new Properties();
-//			selectProps.setProperty(COMMAND_NAMESPACE, MYAPP_COMMAND_NAMESPACE);
-//			selectProps.setProperty(COMMAND, "step3_PCG_suscepChromo");
-//			selectProps.setProperty(COMMAND_DESCRIPTION,  PCG_NeighborNetworkDescription);
-//			selectProps.setProperty(COMMAND_LONG_DESCRIPTION, PCG_NeighborNetworkLongDescription);
-//			selectProps.setProperty(COMMAND_SUPPORTS_JSON, "true");
-//			selectProps.setProperty(COMMAND_EXAMPLE_JSON,  getCG_SuscepChromosome());
-//			selectProps.setProperty(PREFERRED_MENU, "Apps.HaTrang.Provide Candidate Gene Set");
-//			selectProps.setProperty(TITLE, "User-defined");
-//			selectProps.setProperty(MENU_GRAVITY, "11.0");
-//			selectProps.setProperty(TOOLTIP,  PCG_NeighborNetworkDescription);
-//			registerService(context, provideCandidateGeneSetTaskFactory, NetworkTaskFactory.class, selectProps);
-//		}
+		{
+			Properties selectProps = new Properties();
+			PCG_UserDefineTaskFactory provideCandidateGeneSetTaskFactory = new PCG_UserDefineTaskFactory(cyNetworkFactory, cyNetworkManager, cyTaskManager);
+			String PCG_NeighborNetworkDescription = "Step 3: Select candidate sets - User-defined";
+			String PCG_NeighborNetworkLongDescription="Step 3: Provide candidate gene sets by selecting User-defined"
+					+ "\n\nThis step is followed "
+					+ "\n\n\t+ Step 1: Build Heterogeneous Network at 'POST /v1/commands/"+MYAPP_COMMAND_NAMESPACE+"/step1_build_network)"
+					+ "\n\n\t+ Step 2.1: Select disease at 'POST /v1/commands/"+MYAPP_COMMAND_NAMESPACE+"/step21_select_disease"
+					+ "\n\n\t+ Step 2.2: Select disease of interest and associated genes 'POST /v1/commands/"+MYAPP_COMMAND_NAMESPACE+"/step22_create_training_list"
+					+ "\n\nThere are five ways to construct a candidate gene set: "
+					+ "\n\n\t+ Neighbors of Training Genes in Gene Network"
+					+ "\n\n\t+ Neighbors Of Training Genes in Chromosome (also known as Artificial Linkage Interval)"
+					+ "\n\n\t+ All remaining genes in Gene Network"
+					+ "\n\n\t+ Susceptible Chromosome Regions/Bands"
+					+ "\n\n\t+ User-defined"
+					+ "\n\nThis command uses 'User-defined'. Refer to other ways by looking at the other commands";
+			
+			
+			selectProps = new Properties();
+			selectProps.setProperty(COMMAND_NAMESPACE, MYAPP_COMMAND_NAMESPACE);
+			selectProps.setProperty(COMMAND, "step3_PCG_userDefined");
+			selectProps.setProperty(COMMAND_DESCRIPTION,  PCG_NeighborNetworkDescription);
+			selectProps.setProperty(COMMAND_LONG_DESCRIPTION, PCG_NeighborNetworkLongDescription);
+			selectProps.setProperty(COMMAND_SUPPORTS_JSON, "true");
+			selectProps.setProperty(COMMAND_EXAMPLE_JSON,  getCG_UserDefinedExample());
+			selectProps.setProperty(PREFERRED_MENU, "Apps."+MYAPP_COMMAND_NAMESPACE+".Step 3: Provide Candidate Gene Set");
+			selectProps.setProperty(TITLE, "User-defined");
+			selectProps.setProperty(MENU_GRAVITY, "11.0");
+			selectProps.setProperty(TOOLTIP,  PCG_NeighborNetworkDescription);
+			registerService(context, provideCandidateGeneSetTaskFactory, NetworkTaskFactory.class, selectProps);
+		}
 		
 		{
 			Properties selectProps = new Properties();
@@ -479,5 +481,12 @@ public class CyActivator extends AbstractCyActivator {
 		gf.add(new RankedGene("", "112000", "CHEK2", "RP11-436C9.1, CDS1",1,"Gene/Protein",true,false,"0.01817476"));
 		
 		return PrioritizeTask.getJson(new RankedResult(gf,df));
+	}
+	
+	public static final String getCG_UserDefinedExample(){
+		ArrayList<RankedGene> gf=new ArrayList<>();
+		gf.add(new RankedGene("", "112000", "CHEK2", "RP11-436C9.1, CDS1","Gene/Protein",true,false));
+		
+		return PCG_UserDefineTask.getJson(gf);
 	}
 }
