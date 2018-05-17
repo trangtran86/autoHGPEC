@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiResponses;
  */
 
 @Api(tags = "Apps: autoHGPEC")
-@Path("/hgpec/v1/")
+@Path("/autoHgpec/v1/")
 public interface HGPECresource {
 	/**
     *
