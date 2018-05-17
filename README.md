@@ -1,0 +1,3 @@
+# autoHGPEC
+
+Identification of novel disease-gene and disease-disease associations is an important task in biomedical research. Recently, we have developed a Cytoscape app, namely HGPEC, using a state-of-the-art network-based method for such task. Here, we describe an upgrading version of HGPEC, namely autoHGPEC, with added automation features. By adding these functions, autoHGPEC can be used as a component of other complex analysis pipelines as well as make use of other data resources. We demonstrated the use of autoHGPEC by predicting novel breast cancer-associated genes and diseases. Further investigation by visualizing and collecting evidences for associations between top 20 ranked genes/diseases and breast cancer has shown the ability of autoHGPEC.
